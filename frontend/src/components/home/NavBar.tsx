@@ -80,7 +80,7 @@ const NavBar: React.FC = () => {
                     </a>
                   </li>
                 </ul>
-                <a href="#" className="btn text-white fs-14 btn-header">
+                <a href="/register" className="btn text-white fs-14 btn-header">
                   <strong>Register</strong>
                 </a>
               </div>
