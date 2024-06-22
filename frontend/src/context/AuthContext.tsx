@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { createContext, useState, ReactNode, useContext } from "react";
-// import { jwtDecode } from "jwt-decode";
+import React, { createContext, useState, ReactNode, useContext, useEffect } from "react";
+import { register as registerService } from "../services/Register";
 
 // Definisikan tipe untuk state auth
 interface AuthState {
@@ -11,7 +11,8 @@ interface AuthState {
 // Definisikan tipe untuk context
 interface AuthContextType {
   authState: AuthState;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<string | void>;
+  register: (name: string, email: string, password: string) => Promise<string | undefined>;
   logout: () => void;
 }
 
@@ -20,10 +21,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Buat provider untuk context
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    email: "",
-    isAuthenticated: false,
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    const savedAuthState = localStorage.getItem("authState");
+    return savedAuthState
+      ? JSON.parse(savedAuthState)
+      : { email: "", isAuthenticated: false };
   });
+
+  useEffect(() => {
+    localStorage.setItem('authState', JSON.stringify(authState));
+  }, [authState]);
+
+  const register = async (name: string, email: string, password: string): Promise<string | undefined> => {
+    const errorMessage = await registerService(name, email, password);
+    if (!errorMessage) {
+      setAuthState({ email, isAuthenticated: true });
+    }
+    return errorMessage;
+  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -41,6 +56,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
       // Simpan data autentikasi atau token sesuai kebutuhan
       localStorage.setItem("token", response.data.token);
+
       setAuthState({ email, isAuthenticated: true });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -57,7 +73,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authState, login, logout }}>
+    <AuthContext.Provider value={{ authState, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

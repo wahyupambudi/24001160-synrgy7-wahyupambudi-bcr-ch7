@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "../../context/AuthContext";
 import "../../assets/css/bootstrap.css";
 import "../../assets/css/owl/owl.carousel.css";
 import "../../assets/css/owl/owl.theme.default.min.css";
@@ -7,6 +8,7 @@ import "../../assets/css/style.css";
 import logo from "../../assets/images/main/logo.png";
 import imgCar from "../../assets/images/main/img_car.png";
 import closeHmb from "../../assets/images/main/icon/fi_x.png";
+import { useNavigate } from "react-router-dom";
 
 const hideSidebar = () => {
   const hideSidebar = document.getElementById("navbarSupportedContent");
@@ -16,6 +18,14 @@ const hideSidebar = () => {
 };
 
 const NavBar: React.FC = () => {
+  const { authState, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <div>
       <header className="bg-header">
@@ -80,9 +90,18 @@ const NavBar: React.FC = () => {
                     </a>
                   </li>
                 </ul>
-                <a href="/register" className="btn text-white fs-14 btn-header">
-                  <strong>Register</strong>
-                </a>
+                {authState.isAuthenticated ? (
+                    <button className="btn text-white fs-14 btn-danger" onClick={handleLogout}>Logout</button>
+                ) : (
+                  <>
+                    <a
+                      href="/register"
+                      className="btn text-white fs-14 btn-header"
+                    >
+                      <strong>Register</strong>
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </nav>

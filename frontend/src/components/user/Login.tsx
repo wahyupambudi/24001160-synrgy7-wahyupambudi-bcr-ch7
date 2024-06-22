@@ -9,7 +9,11 @@ const LoginUser: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
+  const { authState, login } = useAuth();
+
+  if(authState.isAuthenticated) {
+    navigate("/cars")
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +23,7 @@ const LoginUser: React.FC = () => {
     if (errorMessage) {
       setError(errorMessage);
     } else {
-      navigate("/dashboard");
+      navigate("/cars");
     }
   };
   return (

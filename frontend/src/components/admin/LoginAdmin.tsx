@@ -4,29 +4,7 @@ import logo from "../../assets/images/main/logo.png";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
-// interface LoginParams {
-//   email: string;
-//   password: string;
-// }
-
-// async function doLogin({ email, password }: LoginParams): Promise<string> {
-//   console.log({ email, password });
-//   // Use your own endpoint
-//   const response = await fetch("http://localhost:3000/api/v1/auth/login", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       email,
-//       password,
-//     }),
-//   });
-//   const data = await response.json();
-//   return data.token;
-// }
-
-const AuthLogin: React.FC = () => {
+const LoginUser: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -35,45 +13,15 @@ const AuthLogin: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-      // navigate("/dashboard");
-    } catch (error) {
-      setError('Login failed. Please check your credentials and try again.');
-      console.log(setError)
+    setError(""); // Reset error state before login attempt
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const errorMessage: any = await login(email, password);
+    if (errorMessage) {
+      setError(errorMessage);
+    } else {
+      navigate("/dashboard");
     }
   };
-
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError(''); // Reset error state before login attempt
-  //   const errorMessage = await login(email, password);
-  //   if (errorMessage != undefined) {
-  //     setError(errorMessage);
-  //   } else {
-  //     navigate('/dashboard');
-  //   }
-  // };
-
-
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  // const token = localStorage.getItem("token");
-
-  // useEffect(() => {
-  //   setIsLoggedIn(!!token);
-  // }, [token]);
-
-  // const handleLogin = () => {
-  //   setIsLoading(true);
-  //   doLogin({ email, password })
-  //     .then((token) => {
-  //       localStorage.setItem("token", token);
-  //       navigate("/dashboard");
-  //     })
-  //     .catch((err) => console.log(err.message))
-  //     .finally(() => setIsLoading(false));
-  // };
   return (
     <div>
       <section className="vh-100">
@@ -101,9 +49,13 @@ const AuthLogin: React.FC = () => {
                     className="fw-normal mb-3 pb-3"
                     style={{ letterSpacing: "1px" }}
                   >
-                    Welcome, Admin BCR
+                    Welcome, User BCR
                   </h3>
-
+                  {error && (
+                    <div className="alert alert-danger" role="alert">
+                      {error}
+                    </div>
+                  )}
                   <div data-mdb-input-init className="form-outline mb-4">
                     <label className="form-label" htmlFor="email">
                       Email address
@@ -129,7 +81,6 @@ const AuthLogin: React.FC = () => {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  {error && <div style={{ color: 'red' }}>{error}</div>}
                   <div className="pt-1 mb-4">
                     <button
                       data-mdb-button-init
@@ -149,4 +100,4 @@ const AuthLogin: React.FC = () => {
     </div>
   );
 };
-export default AuthLogin;
+export default LoginUser;
