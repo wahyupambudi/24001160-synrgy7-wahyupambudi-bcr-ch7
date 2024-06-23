@@ -7,6 +7,8 @@ import AuthLogin from "./components/admin/LoginAdmin";
 import AuthRegister from "./components/user/Register";
 import Dashboard from "./components/admin/Dashboard";
 import LoginUser from "./components/user/Login";
+import NotFound from "./components/NotFound";
+import Cars from "./components/admin/Cars";
 
 function App() {
   return (
@@ -16,10 +18,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cars" element={<FilterCar />} />
-          <Route path="/admin/login" element={<AuthLogin />} />
           <Route path="/register" element={<AuthRegister />} />
           <Route path="/login" element={<LoginUser />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin/login" element={<AuthLogin />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/cars" element={<Cars />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider >

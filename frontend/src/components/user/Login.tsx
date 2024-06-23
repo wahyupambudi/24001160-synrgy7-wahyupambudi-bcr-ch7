@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import car from "../../assets/images/main/carAdmin.png";
 import logo from "../../assets/images/main/logo.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
 const LoginUser: React.FC = () => {
@@ -11,9 +11,11 @@ const LoginUser: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { authState, login } = useAuth();
 
-  if(authState.isAuthenticated) {
-    navigate("/cars")
-  }
+  useEffect(() => {
+    if(authState.isAuthenticated) {
+      navigate("/cars")
+    }
+  }, [authState.isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

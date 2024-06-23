@@ -8,7 +8,7 @@ import "../../assets/css/style.css";
 import logo from "../../assets/images/main/logo.png";
 import imgCar from "../../assets/images/main/img_car.png";
 import closeHmb from "../../assets/images/main/icon/fi_x.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const hideSidebar = () => {
   const hideSidebar = document.getElementById("navbarSupportedContent");
@@ -32,9 +32,9 @@ const NavBar: React.FC = () => {
         <div className="container">
           <nav className="navbar navbar-expand-lg navbar-light ">
             <div className="container-fluid">
-              <a className="navbar-brand" href="/">
+              <Link className="navbar-brand" to="/">
                 <img src={logo} alt="logo" />
-              </a>
+              </Link>
               <button
                 className="navbar-toggler"
                 type="button"
@@ -94,12 +94,12 @@ const NavBar: React.FC = () => {
                     <button className="btn text-white fs-14 btn-danger" onClick={handleLogout}>Logout</button>
                 ) : (
                   <>
-                    <a
-                      href="/register"
+                    <Link
+                      to="/register"
                       className="btn text-white fs-14 btn-header"
                     >
                       <strong>Register</strong>
-                    </a>
+                    </Link>
                   </>
                 )}
               </div>
@@ -118,9 +118,9 @@ const NavBar: React.FC = () => {
                   kualitas terbaik dengan harga terjangkau. Selalu siap melayani
                   kebutuhanmu untuk sewa mobil selama 24 jam.
                 </p>
-                <a href="/cars" className="btn text-white fs-14 btn-header">
+                <Link to="/cars" className="btn text-white fs-14 btn-header">
                   <strong>Mulai Sewa Mobil</strong>
-                </a>
+                </Link>
               </div>
               <div className="col">
                 <img src={imgCar} className="img mt-24 img-car" alt="img_car" />

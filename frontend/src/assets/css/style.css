@@ -58,6 +58,10 @@ body {
   margin-right: 6rem !important;
 }
 
+.m-r-5 {
+  margin-right: 5px !important;
+}
+
 /*padding*/
 .p-0 {
   padding: 0px;

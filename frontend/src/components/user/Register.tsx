@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import car from "../../assets/images/main/carAdmin.png";
 import logo from "../../assets/images/main/logo.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const AuthRegister: React.FC = () => {
   const [name, setName] = useState('');
@@ -12,9 +12,11 @@ const AuthRegister: React.FC = () => {
   const {authState, register } = useAuth();
   const navigate = useNavigate();
 
-  if(authState.isAuthenticated) {
-    navigate("/cars")
-  }
+  useEffect(() => {
+    if(authState.isAuthenticated) {
+      navigate("/cars")
+    }
+  }, [authState.isAuthenticated, navigate]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +114,7 @@ const AuthRegister: React.FC = () => {
                   </div>
                   <div className="card-footer text-center pt-0 px-lg-2 px-1">
                       <p className="mb-4 text-sm mx-auto">
-                        Already have an account? <a href="/login" style={{ textDecoration: "none" }}>Sign In</a>
+                        Already have an account? <Link to="/login" style={{ textDecoration: "none" }}>Sign In</Link>
                       </p>
                     </div>
                 </form>
