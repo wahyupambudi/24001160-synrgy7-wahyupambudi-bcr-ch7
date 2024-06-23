@@ -169,7 +169,7 @@ input[type="time"] {
 .img-car-filter {
   object-fit: cover;
   height: 222px;
-  width: 303px;
+  width: 100%;
   margin-bottom: 15px;
 }
 

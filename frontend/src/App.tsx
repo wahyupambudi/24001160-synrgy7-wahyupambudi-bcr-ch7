@@ -23,6 +23,7 @@ function App() {
           <Route path="/admin/login" element={<AuthLogin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/cars" element={<Cars />} />
+          <Route path="/admin/cars/add" element={<Cars />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
