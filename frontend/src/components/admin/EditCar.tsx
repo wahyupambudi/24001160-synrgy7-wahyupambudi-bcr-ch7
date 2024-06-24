@@ -1,29 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-interface AddCarFormProps {
-  onCarAdded: () => void;
+interface Car {
+  id: number;
+  user_id: number;
+  car_name: string;
+  type: string;
+  desc: string;
+  seat: number;
+  transmission: string;
+  year: string;
+  price: number;
+  availabillity: boolean;
+  start_rent: string;
+  end_rent: string;
+  img: string;
+  created_At: Date;
+  updated_At: Date;
+  deleted_At: Date | null;
+}
+
+interface EditCarFormProps {
+  car: Car;
+  onCarUpdated: () => void;
   onCancel: () => void;
 }
 
-const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
-  const [car_name, setCarName] = useState("");
-  const [type, setType] = useState("");
-  const [desc, setDesc] = useState("");
-  const [seat, setSeat] = useState(0);
-  const [transmission, setTransmission] = useState("");
-  const [year, setYear] = useState("");
-  const [price, setPrice] = useState(0);
-  const [availabillity, setAvailabillity] = useState(true);
-  const [start_rent, setStartRent] = useState("");
-  const [end_rent, setEndRent] = useState("");
+const EditCarForm: React.FC<EditCarFormProps> = ({
+  car,
+  onCarUpdated,
+  onCancel,
+}) => {
+  const [carName, setCarName] = useState(car.car_name);
+  const [type, setType] = useState(car.type);
+  const [desc, setDesc] = useState(car.desc);
+  const [seat, setSeat] = useState(car.seat);
+  const [transmission, setTransmission] = useState(car.transmission);
+  const [year, setYear] = useState(car.year);
+  const [price, setPrice] = useState(car.price);
+  const [availabillity, setAvailabillity] = useState(car.availabillity);
+  const [startRent, setStartRent] = useState(car.start_rent);
+  const [endRent, setEndRent] = useState(car.end_rent);
   const [img, setImg] = useState<File | null>(null);
+
+  useEffect(() => {
+    setCarName(car.car_name);
+    setType(car.type);
+    setDesc(car.desc);
+    setSeat(car.seat);
+    setTransmission(car.transmission);
+    setYear(car.year);
+    setPrice(car.price);
+    setAvailabillity(car.availabillity);
+    setStartRent(car.start_rent);
+    setEndRent(car.end_rent);
+  }, [car]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("car_name", car_name);
+    formData.append("car_name", carName);
     formData.append("type", type);
     formData.append("desc", desc);
     formData.append("seat", seat.toString());
@@ -31,25 +68,29 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
     formData.append("year", year);
     formData.append("price", price.toString());
     formData.append("availabillity", availabillity.toString());
-    formData.append("start_rent", start_rent);
-    formData.append("end_rent", end_rent);
+    formData.append("start_rent", startRent);
+    formData.append("end_rent", endRent);
     if (img) {
       formData.append("img", img);
     }
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3000/api/v1/cars/create", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      onCarAdded(); // Panggil fungsi ini setelah mobil berhasil ditambahkan
-      toast.success("Data Berhasil Ditambah");
+      await axios.put(
+        `http://localhost:3000/api/v1/cars/update/${car.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      onCarUpdated(); // Panggil fungsi ini setelah mobil berhasil diperbarui
+      toast.success("Data Berhasil Diupdate");
     } catch (error) {
-      toast.error("Data Gagal Ditambah");
-      console.error("Failed to add car", error);
+      toast.error("Data Gagal Diupdate");
+      console.error("Failed to update car", error);
     }
   };
 
@@ -65,7 +106,7 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               type="text"
               className="form-control w-100"
               id="car_name"
-              value={car_name}
+              value={carName}
               onChange={(e) => setCarName(e.target.value)}
               required
             />
@@ -120,7 +161,6 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               onChange={(e) =>
                 setImg(e.target.files ? e.target.files[0] : null)
               }
-              required
             />
           </div>
           <div className="mb-3 form-check">
@@ -138,19 +178,6 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
         </div>
         <div className="col">
           <div className="mb-3">
-            <label htmlFor="year" className="form-label">
-              Year
-            </label>
-            <input
-              type="text"
-              className="form-control w-100"
-              id="year"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-3">
             <label htmlFor="transmission" className="form-label">
               Transmission
             </label>
@@ -160,6 +187,19 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               id="transmission"
               value={transmission}
               onChange={(e) => setTransmission(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="year" className="form-label">
+              Year
+            </label>
+            <input
+              type="text"
+              className="form-control w-100"
+              id="year"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
               required
             />
           </div>
@@ -176,6 +216,7 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               required
             />
           </div>
+
           <div className="mb-3">
             <label htmlFor="start_rent" className="form-label">
               Start Rent
@@ -184,7 +225,7 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               type="date"
               className="form-control w-100"
               id="start_rent"
-              value={start_rent}
+              value={startRent}
               onChange={(e) => setStartRent(e.target.value)}
               required
             />
@@ -197,7 +238,7 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
               type="date"
               className="form-control w-100"
               id="end_rent"
-              value={end_rent}
+              value={endRent}
               onChange={(e) => setEndRent(e.target.value)}
               required
             />
@@ -206,7 +247,7 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
       </div>
 
       <button type="submit" className="btn btn-primary m-r-10">
-        Add Car
+        Update Car
       </button>
       <button type="button" className="btn btn-secondary" onClick={onCancel}>
         Cancel
@@ -215,4 +256,4 @@ const AddCarForm: React.FC<AddCarFormProps> = ({ onCarAdded, onCancel }) => {
   );
 };
 
-export default AddCarForm;
+export default EditCarForm;

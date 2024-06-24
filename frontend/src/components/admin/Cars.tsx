@@ -82,7 +82,10 @@ const Cars: React.FC = () => {
                 </Col>
               </Row>
               {showAddCarForm ? (
-                <AddCarForm onCarAdded={handleCarAdded} />
+                <AddCarForm
+                  onCarAdded={handleCarAdded}
+                  onCancel={() => setShowAddCarForm(false)}
+                />
               ) : (
                 <ListCars />
               )}
