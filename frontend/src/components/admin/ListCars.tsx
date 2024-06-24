@@ -3,8 +3,9 @@ import axios from "axios";
 import { format } from 'date-fns';
 import rent from "../../assets/images/main/icon/fi_key.png";
 import clock from "../../assets/images/main/icon/fi_clock.png";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Modal, Row } from "react-bootstrap";
 import imgCar from "../../assets/images/cars/car01.min.jpg";
+import { toast } from "react-toastify";
 
 interface Car {
   id: number;
@@ -27,6 +28,8 @@ interface Car {
 
 const ListCars: React.FC = () => {
   const [cars, setCars] = useState<Car[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +53,24 @@ const ListCars: React.FC = () => {
     fetchCars();
   }, []);
 
+  const handleDelete = async () => {
+    if (selectedCar) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:3000/api/v1/cars/delete/${selectedCar.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCars(cars.filter(car => car.id !== selectedCar.id));
+        setShowModal(false);
+        toast.success('Data Berhasil Dihapus');
+      } catch (error) {
+        console.error('Failed to delete car', error);
+      }
+    }
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -60,12 +81,27 @@ const ListCars: React.FC = () => {
 
   return (
     <div>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Car</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this car?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
       <div className="row" id="cars-container">
         {cars.map((car) => (
           <div className="col-md-4">
             <div className="card shadow p-3 rounded">
               <img
-                className="img-car-filter"
+                className="img-car-filter rounded"
                 src={imgCar}
                 alt=""
               />
@@ -92,6 +128,10 @@ const ListCars: React.FC = () => {
                       type="button"
                       className="btn btn-sm btn-outline-danger"
                       style={{ width: "100%", marginRight: "10px" }}
+                      onClick={() => {
+                        setSelectedCar(car);
+                        setShowModal(true);
+                      }}
                     >
                       Delete
                     </button>
@@ -110,6 +150,7 @@ const ListCars: React.FC = () => {
           </div>
         ))}
       </div>
+      
     </div>
   );
 };
