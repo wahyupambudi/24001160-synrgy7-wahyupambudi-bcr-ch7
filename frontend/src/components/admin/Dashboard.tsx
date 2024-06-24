@@ -5,10 +5,11 @@ import Sidebar from "./Sidebar";
 import TopNavbar from "./TopNavbar";
 import { useEffect } from "react";
 import Breadcrumb from "../Breadcrumb";
+import ListData from "./ListData";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { authState, logout } = useAuth();
+  const { authState} = useAuth();
 
 
   useEffect(() => {
@@ -26,14 +27,8 @@ const Dashboard: React.FC = () => {
         <Col md={10}>
           <TopNavbar />
           <Breadcrumb />
-          <div style={{ backgroundColor: "#f4f5f7" }}>
-            <h1>Welcome to the Dashboard!</h1>
-            {authState.isAuthenticated ? (
-              <p>You are logged in as {authState.email}</p>
-            ) : (
-              <p>You are not logged in.</p>
-            )}
-            <button onClick={logout}>Logout</button>
+          <div style={{ backgroundColor: "#f4f5f7", padding: "10px" }}>
+           <ListData />
           </div>
         </Col>
       </Row>
