@@ -1,48 +1,198 @@
+import React, { useState, useEffect, useRef } from "react";
+import DataCar from "./DataCar";
 import "../../assets/css/car-rental.css";
 
+interface Car {
+  id: string;
+  model: string;
+  manufacture: string;
+  rentPerDay: number;
+  description: string;
+  capacity: number;
+  transmission: string;
+  year: number;
+  image: string;
+  available: boolean;
+  availableAt: string;
+}
 
-const FilterCars: React.FC = () => {
-    return (
-      <div>
-          <section style={{ position: "relative" }} className="mt-45">
-    <div className="container w-1047 shadow p-3 rounded fs-12 bg-body">
-      <div className="row justify-content-around">
-        <div className="col-md-2">
-          <label htmlFor="driverType" className="form-label">Tipe Driver</label>
-          <select className="form-select fs-12 h-36 placeholder" aria-label="Default select example" id="driverType">
-            <option value="0" selected>Pilih Tipe Driver</option>
-            <option value="Dengan Supir">Dengan Sopir</option>
-            <option value="Tanpa Supir">Tanpa Sopir (Lepas Kunci)</option>
-          </select>
+const SearchBar: React.FC = () => {
+  const [formData, setFormData] = useState({
+    driverType: "",
+    date: "",
+    time: "",
+    passengers: "",
+  });
+
+  const [dateType, setDateType] = useState<"text" | "date">("text");
+  const [timeType, setTimeType] = useState<"text" | "time">("text");
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [cars, setCars] = useState<Car[]>([]);
+  const [filteredCars, setFilteredCars] = useState<Car[]>([]);
+
+  const driverInput = useRef<HTMLSelectElement>(null);
+  const dateInput = useRef<HTMLInputElement>(null);
+  const timeInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const { driverType, date, time } = formData;
+    setIsButtonEnabled(driverType !== "" && date !== "" && time !== "");
+  }, [formData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "https://raw.githubusercontent.com/fnurhidayat/probable-garbanzo/main/data/cars.min.json"
+        );
+        const data = await response.json();
+        localStorage.setItem("CARS", JSON.stringify(data));
+        setCars(data);
+      } catch (error) {
+        console.error("Error fetching car data:", error);
+      }
+    };
+
+    const localData = localStorage.getItem("CARS");
+    if (localData) {
+      setCars(JSON.parse(localData));
+    } else {
+      fetchData();
+    }
+  }, []);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
+  };
+
+  const handleSearch = () => {
+    const { date, time, passengers } = formData;
+    const orderDate = new Date(date + "T" + time + ":00.000Z");
+    const seat = +passengers;
+
+    const filtered = cars.filter(
+      (car) => new Date(car.availableAt) < orderDate && car.capacity >= seat
+    );
+    setFilteredCars(filtered);
+  };
+
+  return (
+    <>
+      <section style={{ position: "relative" }} className="mt-45">
+        <div className="container w-1047 shadow p-3 rounded fs-12 bg-body">
+          <div className="row justify-content-around">
+            <div className="col-md-2">
+              <label className="form-label w-200" htmlFor="driverType">
+                Tipe Driver
+              </label>
+              <select
+                id="driverType"
+                value={formData.driverType}
+                onChange={handleInputChange}
+                ref={driverInput}
+                className="form-select fs-12 h-36 placeholder"
+              >
+                <option
+                  disabled
+                  value=""
+                  hidden
+                  className="form-control fs-12 h-36 placeholder"
+                >
+                  Pilih Tipe Driver
+                </option>
+                <option value="Dengan sopir" className="optionEl">
+                  Dengan Driver
+                </option>
+                <option value="Tanpa sopir" className="optionEl">
+                  Tanpa Driver (Lepas Kunci)
+                </option>
+              </select>
+            </div>
+            <div className="col-md-2">
+              <label className="form-label w-200" htmlFor="date">
+                Tanggal
+              </label>
+              <input
+                type={dateType}
+                id="date"
+                placeholder="Pilih Tanggal"
+                onFocus={() => setDateType("date")}
+                onBlur={() => setDateType("text")}
+                value={formData.date}
+                onChange={handleInputChange}
+                ref={dateInput}
+                className="form-control fs-12 h-36 placeholder"
+              />
+            </div>
+            <div className="col-md-2">
+              <label className="form-label w-200" htmlFor="time">
+                Waktu Jemput/Ambil
+              </label>
+              <input
+                type={timeType}
+                id="time"
+                placeholder="Pilih Waktu"
+                onFocus={() => setTimeType("time")}
+                onBlur={() => setTimeType("text")}
+                value={formData.time}
+                onChange={handleInputChange}
+                ref={timeInput}
+                className="form-control fs-12 h-36 placeholder"
+              />
+            </div>
+            <div className="col-md-2">
+              <label className="form-label w-200" htmlFor="passengers">
+                Jumlah Penumpang
+              </label>
+              <input
+                id="passengers"
+                maxLength={1}
+                placeholder="Jumlah Penumpang"
+                value={formData.passengers}
+                onChange={handleInputChange}
+                className="form-control fs-12 h-36 placeholder"
+              />
+            </div>
+            <div className="col-md-2">
+              <label
+                htmlFor=""
+                className="form-label w-200"
+                style={{ visibility: "hidden" }}
+              >
+                cari
+              </label>
+              <button
+                className="btn text-white fs-14 btn-header"
+                id="search-btn"
+                onClick={handleSearch}
+                disabled={!isButtonEnabled}
+              >
+                Cari Mobil
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="col-md-2">
-          <label htmlFor="date" className="form-label">Tanggal</label>
-          <input type="date" placeholder="Pilih Tanggal"
-            className="form-control fs-12 h-36 placeholder" id="date" aria-describedby="date" />
+      </section>
+      <section>
+        <div className="container w-1047 p-0">
+          <br />
+          <div className="row" id="cars-container">
+            {filteredCars.map((car) => (
+              <div className="col-md-4">
+                <DataCar key={car.id} car={car} />
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="col-md-2">
-          <label htmlFor="pickupTime" className="form-label">Waktu Jemput / Ambil</label>
-          <select className="form-select fs-12 h-36 placeholder" aria-label="Default select example" id="pickupTime">
-            <option value="0" selected>Pilih Waktu</option>
-            <option value="08:00">08:00 WIB</option>
-            <option value="09:00">09:00 WIB</option>
-            <option value="10:00">10:00 WIB</option>
-            <option value="11:00">11:00 WIB</option>
-            <option value="12:00">12:00 WIB</option>
-          </select>
-        </div>
-        <div className="col-md-2">
-          <label htmlFor="seat" className="form-label w-200">Jumlah Penumpang (optional)</label>
-          <input type="number" className="form-control fs-12 h-36 placeholder" id="seat" aria-describedby="seat"
-            placeholder="Jumlah Penumpang" />
-        </div>
-        <div className="col-md-2">
-          <label htmlFor="" className="form-label w-200" style={{ visibility: "hidden"}}>cari</label>
-          <button className="btn text-white fs-14 btn-header" id="filter-btn" disabled>Cari Mobil</button>
-        </div>
-      </div>
-    </div>
-  </section>
-      </div>
-    )}
-export default FilterCars;
+      </section>
+    </>
+  );
+};
+
+export default SearchBar;
