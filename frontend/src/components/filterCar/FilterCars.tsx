@@ -184,6 +184,7 @@ const SearchBar: React.FC = () => {
           <br />
           <div className="row" id="cars-container">
             {filteredCars.map((car) => (
+              // eslint-disable-next-line react/jsx-key
               <div className="col-md-4">
                 <DataCar key={car.id} car={car} />
               </div>
